@@ -26,13 +26,7 @@ class RelationshipTemplate extends ToscaObject {
 	}
 	
 	Map<String, String> getMetadata() {
-		def result = [:]
-		if (model.'metadata' != null) {
-			if (!(model.'metadata' instanceof Map)) {
-				throw new Exception("relationship template ${this.name} metadata should be a map")
-			}
-		}
-		return result
+		return ToscaModel.getMetadata(model)
 	}
 
 }

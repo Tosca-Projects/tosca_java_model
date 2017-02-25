@@ -10,8 +10,8 @@ import parser.ToscaParser
 class TestToscaBuilder {
 
 	@Test
-	public void testSimpleCompute() {
-		def model = ToscaBuilder.simple_compute()
+	public void testSimpleTopologyTemplate() {
+		def model = ToscaBuilder.simple_topology_template()
 		def src = new Yaml().dump(model)
 		assert ToscaParser.validate_tosca_yaml(src)
 		assert ToscaParser.validate_service_template(model)

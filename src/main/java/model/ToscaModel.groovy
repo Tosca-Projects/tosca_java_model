@@ -1,8 +1,23 @@
 package model
 
+import java.util.List;
+import java.util.Map;
+
 import utils.Logger
 
 abstract class ToscaModel {
+	
+	static checkIsMap(model, String name) {
+		if (model[name] != null && !(model[name] instanceof Map)) {
+			throw new Exception("'$name' should be a map")
+		}
+	}
+
+	static checkIsList(model, String name) {
+		if (model[name] != null && !(model[name] instanceof List)) {
+			throw new Exception("'$name' should be a list")
+		}
+	}
 
 	static checkRequired(Map model, List<String> keynames) {
 		def ok = true
@@ -21,9 +36,7 @@ abstract class ToscaModel {
 		if (model.'attributes' == null) {
 			return [:]
 		}
-		if (!(model.'attributes' instanceof Map)) {
-			throw new Exception("'attributes' should be a map")
-		}
+		checkIsMap(model, 'attributes')
 		Map<String, Attribute> result = [:]
 		Map atts = model.'attributes'
 		atts.each { String att_name, att_def ->
@@ -36,9 +49,7 @@ abstract class ToscaModel {
 		if (model.'properties' == null) {
 			return [:]
 		}
-		if (!(model.'properties' instanceof Map)) {
-			throw new Exception("'properties' should be a map")
-		}
+		checkIsMap(model, 'properties')
 		Map<Property> result = [:]
 		Map props = model.'properties'
 		props.each { String prop_name, prop_def ->
@@ -46,14 +57,12 @@ abstract class ToscaModel {
 		}
 		return result
 	}
-	
+
 	static List<RequirementAssignment> getRequirementAssignments(Map model) {
 		if (model.'requirements' == null) {
 			return []
 		}
-		if (!(model.'requirements' instanceof List)) {
-			throw new Exception("'requirements' should be a list")
-		}
+		checkIsList(model, "requirements")
 		List requirements = model.'requirements'
 		List<RequirementAssignment> result = []
 		requirements.each { r ->
@@ -64,14 +73,12 @@ abstract class ToscaModel {
 		}
 		return result
 	}
-	
+
 	static List<Requirement> getRequirements(Map model) {
 		if (model.'requirements' == null) {
 			return []
 		}
-		if (!(model.'requirements' instanceof List)) {
-			throw new Exception("'requirements' should be a list")
-		}
+		checkIsList(model, "requirements")
 		List requirements = model.'requirements'
 		List<Requirement> result = []
 		requirements.each { r ->
@@ -84,9 +91,7 @@ abstract class ToscaModel {
 		if (model.'capabilities' == null) {
 			return []
 		}
-		if (!(model.'capabilities' instanceof List)) {
-			throw new Exception("'requirements' should be a list")
-		}
+		checkIsList(model, "capabilities")
 		List capabilities = model.'capabilities'
 		def result = []
 		capabilities.each { c ->
@@ -94,19 +99,28 @@ abstract class ToscaModel {
 		}
 		return result
 	}
-	
+
 	static List<String> getListOfString(String name, Map model) {
 		if (model[name] == null) {
 			return []
 		}
-		if (!(model[name] instanceof List)) {
-			throw new Exception("'$name' should be a list")
-		}
+		checkIsList(model, name)
 		List<String> result = []
 		model[name].each { result << it.toString() }
 		return result
 	}
-	
+
+	static Map<String, String> getMetadata(Map model) {
+		def result = [:]
+		if (model.'metadata' != null) {
+			checkIsMap(model, "metadata")
+			model.'metadata'.each {k,s ->
+				result[k] = s.toString()
+			}
+		}
+		return result
+	}
+
 	static Map<String, String> getPropertyAssignments(model) {
 		if (!(model instanceof Map)) {
 			throw new Exception("A property assignment should be a map")
@@ -114,40 +128,31 @@ abstract class ToscaModel {
 		if (model['properties'] == null) {
 			return [:]
 		}
-		if (!(model['properties'] instanceof Map)) {
-			throw new Exception("properties' should be a map")
-		}
+		checkIsMap(model, "properties")
 		def result = [:]
 		model['properties'].each {k,v ->
 			result[k] = v.toString()
 		}
 		return result
 	}
-	
-	static Map<String, String> getAttributeAssignments(model) {
-		if (!(model instanceof Map)) {
-			throw new Exception("An attribute assignment should be a map")
-		}
+
+	static Map<String, String> getAttributeAssignments(Map model) {
 		if (model['attributes'] == null) {
 			return [:]
 		}
-		if (!(model['attributes'] instanceof Map)) {
-			throw new Exception("attributes' should be a map")
-		}
+		checkIsMap(model, "attributes")
 		def result = [:]
 		model['attributes'].each {k,v ->
 			result[k] = v.toString()
 		}
 		return result
 	}
-	
+
 	static List<Constraint> getConstraints(Map model) {
 		if (model.'constraints' == null) {
 			return []
 		}
-		if (!(model.'constraints' instanceof List)) {
-			throw new Exception("'constraints' should be a list")
-		}
+		checkIsList(model, "constraints")
 		List constraints = model.'constraints'
 		List<Constraint> result = []
 		constraints.each { c ->
@@ -158,7 +163,20 @@ abstract class ToscaModel {
 		}
 		return result
 	}
-	
+
+	static List<Parameter> getInputs(Map model) {
+		def result = []
+		if (model.'inputs' != null) {
+			if (!(model.'inputs' instanceof Map)) {
+				throw new Exception("'inputs' should be a map")
+			}
+			model.'inputs'.each { String input_name, input_def ->
+				result << new Parameter(input_name, input_def)
+			}
+		}
+		return result
+	}
+
 	static List<Interface> getInterfaces(Map model) {
 		if (model.'interfaces' == null) {
 			return []
@@ -193,8 +211,8 @@ abstract class ToscaModel {
 		}
 		return result
 	}
-	
-	static NodeFilter getNode_filter(model) {
+
+	static NodeFilter getNode_filter(Map model) {
 		if (model."node_filter" == null) {
 			return null
 		}

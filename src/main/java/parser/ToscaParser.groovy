@@ -102,7 +102,13 @@ class ToscaParser {
 	
 	static boolean validate_topology_template_keywords(Map model) {
 		def valid_topology_template_keywords = [
-			'node_templates', 'inputs', 'outputs', 'relationship_templates', 'substitution_mappings']
+			'node_templates', 
+			'inputs', 
+			'outputs', 
+			'relationship_templates', 
+			'substitution_mappings',
+			'worflows'
+			]
 		def rule = "Valid keywords in topology_template block are $valid_topology_template_keywords"
 		def ok = true
 		model['topology_template']?.each {k,v ->

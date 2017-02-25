@@ -4,7 +4,8 @@ class TopologyTemplate {
 	
 	Map model
 	
-	TopologyTemplate(Map model) {
+	TopologyTemplate(model) {
+		if (!(model instanceof Map))
 		this.model = model
 	}
 	
@@ -13,11 +14,7 @@ class TopologyTemplate {
 	}
 	
 	List<Parameter> getInputs() {
-		def result = []
-		model.'inputs'.each { String input_name, input_def ->
-			result << new Parameter(input_name, input_def)
-		}
-		return result
+		return ToscaModel.getInputs(model)
 	}
 	
 	List<NodeTemplate> getNode_templates() {
@@ -65,8 +62,7 @@ class TopologyTemplate {
 		throw new Exception("Not available")
 	}
 	
-	// TODO workflows
-	List getWorkflows() {
+	List<Workflow> getWorkflows() {
 		throw new Exception("Not available")
 	}
 
