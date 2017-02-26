@@ -2,13 +2,14 @@ package model
 
 class CapabilityAssignment {
 	
+	String name
 	Map model
 	
-	CapabilityAssignment(model) {
+	CapabilityAssignment(String name, model) {
 		if (!(model instanceof Map)) {
 			"a capability assignment should be map"
 		}
-
+		this.name = name
 		this.model = model
 	}
 	

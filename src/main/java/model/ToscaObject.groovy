@@ -18,9 +18,6 @@ abstract class ToscaObject {
 		if (instances[super_type] == null) {
 			instances[super_type] = [:]
 		}
-		if (instances[super_type][name] != null) {
-			throw new Exception("Invalid $super_type definition $name: duplicate")
-		}
 		this.super_type = super_type
 		this.name = name
 		this.model = model

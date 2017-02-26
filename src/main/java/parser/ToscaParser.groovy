@@ -102,6 +102,7 @@ class ToscaParser {
 	
 	static boolean validate_topology_template_keywords(Map model) {
 		def valid_topology_template_keywords = [
+			'description',
 			'node_templates', 
 			'inputs', 
 			'outputs', 

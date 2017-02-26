@@ -3,7 +3,7 @@ package utils
 class Logger {
 	
 	static print_debug = false
-	static print_error = false
+	static print_error = true
 	static print_info = false
 	static last_errors = []
 	

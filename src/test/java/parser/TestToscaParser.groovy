@@ -101,7 +101,7 @@ hello: again
 	public void test_invalid_properties_keywords() {
 		def p = new ToscaParser()
 		def invalid_tosca = new File('src/test/resources/junit/invalid_properties_keywords.yml').text
-		assert p.validate_tosca_yaml(invalid_tosca) == false // FIXME
+		assert p.validate_tosca_yaml(invalid_tosca) == false
 		assert Logger.gotError("'capability' is not a valid keyword")
 	}
 

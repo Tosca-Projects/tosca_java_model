@@ -91,11 +91,11 @@ abstract class ToscaModel {
 		if (model.'capabilities' == null) {
 			return []
 		}
-		checkIsList(model, "capabilities")
-		List capabilities = model.'capabilities'
+		checkIsMap(model, "capabilities")
+		Map capabilities = model.'capabilities'
 		def result = []
-		capabilities.each { c ->
-			result << new CapabilityAssignment(c)
+		capabilities.each { cap_name, cap ->
+			result << new CapabilityAssignment(cap_name, cap)
 		}
 		return result
 	}

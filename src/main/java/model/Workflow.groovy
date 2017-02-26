@@ -1,7 +1,5 @@
 package model
 
-import java.util.List
-import java.util.Map
 
 class Workflow {
 
@@ -36,6 +34,18 @@ class Workflow {
 		def result = []
 		model.'preconditions'.each {
 			result << new Precondition(it)
+		}
+		return result
+	}
+	
+	List<Step> getSteps() {
+		if (model.'steps' == null) {
+			return []
+		}
+		ToscaModel.checkIsMap(model, 'steps')
+		def result = []
+		model.'steps'.each { step_name, step ->
+			result << new Step(step_name, step)
 		}
 		return result
 	}

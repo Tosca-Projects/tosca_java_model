@@ -5,7 +5,9 @@ class TopologyTemplate {
 	Map model
 	
 	TopologyTemplate(model) {
-		if (!(model instanceof Map))
+		if (!(model instanceof Map)) {
+			throw new Exception("topology template should be a map")
+		}
 		this.model = model
 	}
 	
