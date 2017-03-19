@@ -42,6 +42,18 @@ class TestToscaBuilder {
 			}
 		}
 	}
+	
+	@Test
+	public void testTopologyTemplateWithInputs() {
+		def model = ToscaBuilder.topology_template_with_inputs()
+		print model
+		def src = new Yaml().dump(model)
+		assert ToscaParser.validate_tosca_yaml(src)
+		assert ToscaParser.validate_service_template(model)
+		def st = new ServiceTemplate(model)
+		def tt = st.getTopology_template()
+		def i = tt.getInputs()
+	}
 
 	@Test
 	public void testSimpleWorkflow() {
