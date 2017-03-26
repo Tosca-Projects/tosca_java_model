@@ -67,7 +67,6 @@ class TestToscaBuilder {
 	@Test
 	public void testTopologyTemplateWithOutputs() {
 		def model = ToscaBuilder.topology_template_with_outputs()
-		print model
 		def src = new Yaml().dump(model)
 		assert ToscaParser.validate_tosca_yaml(src)
 		assert ToscaParser.validate_service_template(model)
@@ -75,6 +74,14 @@ class TestToscaBuilder {
 		def tt = st.getTopology_template()
 		def o = tt.getOutputs()
 		assert o.size() == 1
+		def p = o[0]
+		assert p.name == 'server_ip'
+		assert p.model instanceof Map
+		assert p.model.'description' == 'The private IP address of the provisioned server.'
+		assert p.model.'value' instanceof Map
+		assert p.model.'value'.'get_attribute' instanceof List
+		assert p.model.'value'.'get_attribute'.size() == 2
+		assert p.model.'value'.'get_attribute' == ['my_server','private_address']
 	}
 
 	@Test
