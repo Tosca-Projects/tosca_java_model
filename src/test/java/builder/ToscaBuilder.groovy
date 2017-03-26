@@ -11,35 +11,48 @@ import java.util.Map
 
 class ToscaBuilder {
 
-	static Map default_host() {
+	static Map host(int num_cpus, String disk_size, String mem_size) {
 		return [
 			properties:[
-				num_cpus:1,
-				disk_size:'10 GB',
-				mem_size:'4096 MB'
+				num_cpus:num_cpus,
+				disk_size:disk_size,
+				mem_size:mem_size
+			]
+		]
+	}
+
+	static Map default_host() {
+		return host(1, '10 GB', '4096 MB')
+	}
+
+	static Map os(String architecture, String type, String distribution, String version) {
+		return [
+			properties:[
+				architecture:architecture,
+				type:type,
+				distribution:distribution,
+				version:version
 			]
 		]
 	}
 
 	static Map default_os() {
+		return os('x86_64','linux','rhel','7.2')
+	}
+
+	static Map compute(String type, String description, Map host, Map os) {
 		return [
-			properties:[
-				architecture:'x86_64',
-				type:'linux',
-				distribution:'rhel', version:'7.2'
+			type:type,
+			description:description,
+			capabilities:[
+				'host':host,
+				'os':os
 			]
 		]
 	}
 
 	static Map default_compute() {
-		return [
-			type:'tosca.nodes.Compute',
-			description:'default compute node',
-			capabilities:[
-				'host':default_host(),
-				'os':default_os()
-			]
-		]
+		return compute('tosca.nodes.Compute','default compute node',default_host(),default_os())
 	}
 
 	static Map simple_topology_template() {
@@ -54,10 +67,16 @@ class ToscaBuilder {
 			]
 		]
 	}
-	
+
 	static Map topology_template_with_inputs() {
 		def t = simple_topology_template()
 		t."topology_template"."inputs" = cpus_inputs()
+		return t
+	}
+
+	static Map topology_template_with_outputs() {
+		def t = simple_topology_template()
+		t."topology_template"."outputs" = server_ip_output()
 		return t
 	}
 
@@ -135,9 +154,21 @@ class ToscaBuilder {
 			'cpus':[
 				type:'integer',
 				description: 'Number of CPUs for the server.',
-				constraints: [
-					[valid_values:[ 1, 2, 4, 8]]
-				]
+				constraints: [[valid_values:[1, 2, 4, 8]]
+				]]
+		]
+	}
+
+	static Map get_attribute(String node_name, String attribute_name) {
+		return [
+			get_attribute:[node_name, attribute_name]]
+	}
+
+	static Map server_ip_output() {
+		return [
+			server_ip:[
+				description:'The private IP address of the provisioned server.',
+				value:get_attribute('my_server','private_address')
 			]
 		]
 	}

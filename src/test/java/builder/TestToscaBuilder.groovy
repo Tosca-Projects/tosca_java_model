@@ -46,13 +46,35 @@ class TestToscaBuilder {
 	@Test
 	public void testTopologyTemplateWithInputs() {
 		def model = ToscaBuilder.topology_template_with_inputs()
-		print model
 		def src = new Yaml().dump(model)
 		assert ToscaParser.validate_tosca_yaml(src)
 		assert ToscaParser.validate_service_template(model)
 		def st = new ServiceTemplate(model)
 		def tt = st.getTopology_template()
 		def i = tt.getInputs()
+		assert i.size() == 1
+		def p = i[0]
+		assert p.name == 'cpus'
+		assert p.model instanceof Map
+		assert p.model.'type' == 'integer'
+		assert p.model.'description' == 'Number of CPUs for the server.'
+		assert p.model.'constraints' instanceof List
+		assert p.model.'constraints'.size() == 1
+		assert p.model.'constraints'[0] instanceof Map
+		assert p.model.'constraints'[0].'valid_values' == [1,2,4,8]
+	}
+
+	@Test
+	public void testTopologyTemplateWithOutputs() {
+		def model = ToscaBuilder.topology_template_with_outputs()
+		print model
+		def src = new Yaml().dump(model)
+		assert ToscaParser.validate_tosca_yaml(src)
+		assert ToscaParser.validate_service_template(model)
+		def st = new ServiceTemplate(model)
+		def tt = st.getTopology_template()
+		def o = tt.getOutputs()
+		assert o.size() == 1
 	}
 
 	@Test

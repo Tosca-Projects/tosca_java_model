@@ -4,8 +4,8 @@ import java.util.Map;
 
 class Property extends ToscaState {
 	
-	Property(String name, prop_def) {
-		super(name, prop_def)
+	Property(String name, prop_def, boolean typed=true) {
+		super(name, prop_def, typed)
 	}
 
 	List<Constraint> getConstraints() {
