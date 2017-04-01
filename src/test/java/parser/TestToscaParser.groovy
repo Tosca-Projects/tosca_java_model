@@ -104,6 +104,13 @@ hello: again
 		assert p.validate_tosca_yaml(invalid_tosca) == false
 		assert Logger.gotError("'capability' is not a valid keyword")
 	}
+	
+	@Test
+	public void test_normative_types() {
+		def p = new ToscaParser()
+		def normative_types = new File('src/test/resources/tosca-normative-types.yaml').text
+		assert p.validate_tosca_yaml(normative_types)
+	}
 
 
 }

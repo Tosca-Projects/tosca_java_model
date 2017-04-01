@@ -27,9 +27,10 @@ class TestServiceTemplate {
 	public void testRepositories_ko() {
 		def valid_tosca = new File('src/test/resources/junit/st_repository_ko.yml').text
 		def model = new Yaml().load(valid_tosca)
+		def st = new ServiceTemplate(model)
 		try {
-			def st = new ServiceTemplate(model)
-			fail("aurait dû planter")
+			def repos = st.getRepositories()
+			fail("aurait dû planter car manque url")
 		}
 		catch (Exception e) {
 			assert Logger.gotError("Keyname 'url' is missing")

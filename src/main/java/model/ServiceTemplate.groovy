@@ -1,15 +1,9 @@
 package model
 
-import javax.swing.JTable.ModelChange;
-
 class ServiceTemplate {
 
-	String tosca_definitions_version
-	Map<String,String> metadata = [:]
-	String description = ''
-	Map dsl_definitions = [:]
-	List<Repository> repositories = []
-	List<Import> imports = []
+	Map model
+	// TODO supprimer et remplacer par des getters
 	List<ArtifactType> artifact_types = []
 	List<DataType> data_types = []
 	List<CapabilityType> capability_types = []
@@ -20,13 +14,11 @@ class ServiceTemplate {
 	List<PolicyType> policy_types = []
 	TopologyTemplate topology_template
 
-	ServiceTemplate(Map model) {
-		tosca_definitions_version = model.'tosca_definitions_version'
-		if (model.'metadata') metadata = model.'metadata'
-		description = model.'description'
-		dsl_definitions = model.'dsl_definitions'
-		model.'repositories'.each {	repo_name, repo_model -> repositories << new Repository(repo_name, repo_model) }
-		model.'imports'.each { import_name, import_model -> imports << new Import(import_name, import_model) }
+	ServiceTemplate(model) {
+		if (!(model instanceof Map)) {
+			throw new Exception("a service template definition should be a map")
+		}
+		this.model = model
 		model.'artifact_types'.each { artifact_types << new ArtifactType(it) }
 		model.'data_types'.each { data_types << new DataType(it) }
 		model.'capability_types'.each { capability_types << new CapabilityType(it) }
@@ -39,4 +31,68 @@ class ServiceTemplate {
 			topology_template = new TopologyTemplate(model.'topology_template')
 		}
 	}
+	
+	public String getTosca_definitions_version() {
+		return model.'tosca_definitions_version'
+	}
+	
+	public Map<String,String> getMetadata() {
+		if (model.'metadata') {
+			ToscaModel.checkIsMap(model, 'metadata')
+			return model.'metadata'
+		}
+		return [:]
+	}
+	
+	public String getTemplate_name() {
+		if (model.'template_name') {
+			return model.'template_name'
+		}
+		return getMetadata('template_name')
+	}
+	
+	public String getTemplate_version() {
+		if (model.'template_version') {
+			return model.'template_version'
+		}
+		return getMetadata('template_version')
+	}
+
+	public String getTemplate_author() {
+		if (model.'template_author') {
+			return model.'template_author'
+		}
+		return getMetadata('template_author')
+	}
+	
+	public String getDescription() {
+		return model.'description'
+	}
+	
+	public Map getDsl_definitions() {
+		if (model.'dsl_definitions') {
+			ToscaModel.checkIsMap(model, 'dsl_definitions')
+			return model.'dsl_definitions'
+		}
+		return [:]
+	}
+	
+	public List<Repository> getRepositories() {
+		ToscaModel.checkIsMap(model, 'repositories')
+		def result = []
+		model.'repositories'.each { repo_name, repo_model -> 
+			result << new Repository(repo_name, repo_model) 
+		}
+		return result
+	}
+	
+	public List<Import> getImports() {
+		ToscaModel.checkIsList(model, 'imports')
+		def result = []
+		model.'imports'.each { import_model -> 
+			result << new Import(import_model) 
+		}
+		return result
+	}
+	
 }

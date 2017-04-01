@@ -1,29 +1,47 @@
 package model
 
 class Import {
-	
-	String name
-	String file
-	String repository
-	String namespace_uri
-	String namespace_prefix
-	
-	Import(String name, String file) {
-		this.file = file
-	}
-	
-	Import(String name, Map model) {
-		if (model.'file' == null) {
-			throw new Exception("invalid import: 'file' missing")
+
+	def model
+
+	Import(model) {
+		if ((model instanceof String) || (model instanceof Map)) {
+			this.model = model
 		}
-		this.file = model.'file'.toString()
-		this.repository = model.'repository'?.toString()
-		this.namespace_uri = model.'namespace_uri'?.toString()
+		throw new Exception("an import definition should be a string or a map")
+	}
+
+	String getFile() {
+		if (model instanceof String) {
+			// Single-line grammar:
+			return model
+		}
+		if (model instanceof Map) {
+			// Multi-line grammar:
+			if (!model.'file') {
+				throw new Exception("a multi-line import definition should have a 'file' keyname")
+			}
+			return model.'file'
+		}
+	}
+	String getRepository() {
+		if (model instanceof Map) {
+			return model.'repository'
+		}
+		return null
 	}
 	
-	String getFile() { return this.file }
-	String getRepository() { return this.repository }
-	String getNamespace_uri() { return this.namespace_uri }
-	String geNamespace_prefix() { return this.namespace_prefix }
+	String getNamespace_uri() {
+		if (model instanceof Map) {
+			return model.'namespace_uri'
+		}
+		return null
+	}
 	
+	String geNamespace_prefix() {
+		if (model instanceof Map) {
+			return model.'namespace_prefix'
+		}
+		return null
+	}
 }

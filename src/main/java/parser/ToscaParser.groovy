@@ -73,7 +73,10 @@ class ToscaParser {
 	static boolean validate_service_template(Map model) {
 		def valid_keywords = [
 			'tosca_definitions_version', 
-			'metadata', 
+			'metadata',
+			'template_name', // should be inside metadata map but seems accepted at root level
+			'template_version', // should be inside metadata map but seems accepted at root level
+			'template_author', // should be inside metadata map but seems accepted at root level
 			'description', 
 			'imports', 
 			'dsl_definitions', 
