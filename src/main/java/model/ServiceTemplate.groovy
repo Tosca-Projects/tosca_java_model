@@ -48,21 +48,21 @@ class ServiceTemplate {
 		if (model.'template_name') {
 			return model.'template_name'
 		}
-		return getMetadata('template_name')
+		return getMetadata().'template_name'
 	}
 	
 	public String getTemplate_version() {
 		if (model.'template_version') {
 			return model.'template_version'
 		}
-		return getMetadata('template_version')
+		return getMetadata().'template_version'
 	}
 
 	public String getTemplate_author() {
 		if (model.'template_author') {
 			return model.'template_author'
 		}
-		return getMetadata('template_author')
+		return getMetadata().'template_author'
 	}
 	
 	public String getDescription() {

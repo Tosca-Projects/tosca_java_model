@@ -10,6 +10,26 @@ import java.util.Map
  */
 
 class ToscaBuilder {
+	
+	static Map simple_service_template() {
+		return [
+			tosca_definitions_version: 'tosca_simple_yaml_1_1',
+			metadata: [
+			  template_name: 'my_template',
+			  template_author: 'OASIS TOSCA TC',			
+			  template_version: '1.0'
+			  ]
+		]
+	}
+
+	static Map simple_service_template2() { // autre syntaxe
+		return [
+			tosca_definitions_version: 'tosca_simple_yaml_1_1',
+			template_name: 'my_template',
+			template_author: 'OASIS TOSCA TC',			
+			template_version: '1.0'
+		]
+	}
 
 	static Map host(int num_cpus, String disk_size, String mem_size) {
 		return [

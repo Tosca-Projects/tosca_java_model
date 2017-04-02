@@ -3,6 +3,7 @@ package builder;
 import static org.junit.Assert.*
 import model.NodeTemplate
 import model.ServiceTemplate
+import model.ToscaModel
 import model.Workflow
 
 import org.junit.Test
@@ -94,5 +95,33 @@ class TestToscaBuilder {
 		assert wf.inputs == []
 		assert wf.preconditions == []
 		assert wf.steps.size() == 1
+	}
+	
+	@Test
+	public void testSimpleServiceTemplate() {
+		def model = ToscaBuilder.simple_service_template()
+		def src = new Yaml().dump(model)
+		assert ToscaParser.validate_tosca_yaml(src)
+		assert ToscaParser.validate_service_template(model)
+		def st = new ServiceTemplate(model)
+		assert st.getTosca_definitions_version() == 'tosca_simple_yaml_1_1'
+		assert st.getMetadata() != null
+		assert st.getTemplate_name() == 'my_template'
+		assert st.getTemplate_author() == 'OASIS TOSCA TC'
+		assert st.getTemplate_version() == '1.0'
+	}
+
+	@Test
+	public void testSimpleServiceTemplate2() {
+		def model = ToscaBuilder.simple_service_template2()
+		def src = new Yaml().dump(model)
+		assert ToscaParser.validate_tosca_yaml(src)
+		assert ToscaParser.validate_service_template(model)
+		def st = new ServiceTemplate(model)
+		assert st.getTosca_definitions_version() == 'tosca_simple_yaml_1_1'
+		assert st.getMetadata() != null
+		assert st.getTemplate_name() == 'my_template'
+		assert st.getTemplate_author() == 'OASIS TOSCA TC'
+		assert st.getTemplate_version() == '1.0'
 	}
 }

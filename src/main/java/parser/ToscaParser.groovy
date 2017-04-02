@@ -63,7 +63,7 @@ class ToscaParser {
 
 	static boolean validate_language_definition(String text) {
 		def rule = "Source must begin with 'tosca_definitions_version'"
-		if (!text.startsWith('tosca_definitions_version')) {
+		if (!text.startsWith('tosca_definitions_version:')&&!text.startsWith('{tosca_definitions_version:')) {
 			Logger.error(rule)
 			return false
 		}

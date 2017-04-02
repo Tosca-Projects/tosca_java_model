@@ -1,8 +1,5 @@
 package model
 
-import java.util.List;
-import java.util.Map;
-
 import utils.Logger
 
 abstract class ToscaModel {
@@ -218,4 +215,5 @@ abstract class ToscaModel {
 		}
 		return new NodeFilter(model."node_filter")
 	}
+
 }
