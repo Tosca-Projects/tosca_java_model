@@ -4,7 +4,6 @@ import java.util.List
 
 class CapabilityType extends ToscaType {
 	
-	List<Attribute> attributes
 	List<String> valid_source_types
 	
 	CapabilityType(String name, model) {
@@ -21,6 +20,10 @@ class CapabilityType extends ToscaType {
 	
 	List<Attribute> getAttributes() {
 		return ToscaModel.getAttributes(model)
+	}
+	
+	List<String> getValid_source_types() {
+		return ToscaModel.getListOfString('valid_source_types', model)
 	}
 
 }

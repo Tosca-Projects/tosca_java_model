@@ -48,4 +48,8 @@ abstract class ToscaType {
 		return instances[type][name]
 	}
 	
+	Map<String, String> getMetadata() {
+		return ToscaModel.getMetadata(this.model)
+	}
+	
 }

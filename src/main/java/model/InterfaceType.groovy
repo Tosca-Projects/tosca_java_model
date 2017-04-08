@@ -2,7 +2,16 @@ package model
 
 class InterfaceType extends ToscaType {
 	
-	List<Property> inputs
-	List<Operation> operations
+	InterfaceType(String name, model) {
+		super('interface_type', name, model)
+	}
+	
+	List<Property> getInputs() {
+		return ToscaModel.getInputs(this.model)
+	}
+	
+	List<Operation> getOperations() {
+			
+	}
 
 }
