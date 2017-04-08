@@ -3,9 +3,7 @@ package model
 import java.util.List
 
 class CapabilityType extends ToscaType {
-	
-	List<String> valid_source_types
-	
+		
 	CapabilityType(String name, model) {
 		super('capability', name, model)
 	}
