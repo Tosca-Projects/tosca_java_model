@@ -11,7 +11,7 @@ class InterfaceType extends ToscaType {
 	}
 	
 	List<Operation> getOperations() {
-			
+		// TODO
 	}
 
 }

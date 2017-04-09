@@ -195,7 +195,7 @@ class ToscaParser {
 		}
 
 		return ok
-	}
+	}	
 
 }
 
