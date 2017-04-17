@@ -4,22 +4,17 @@ import java.util.List;
 
 class ToscaSyntax {
 
-	Map<String, ToscaKeyword> root_keywords = [:]
+	String root
+	ToscaKeyword root_entry
 
-	ToscaKeyword entry(String keyword) {
-		if (root_keywords[keyword] == null) {
-			root_keywords[keyword] = new ToscaKeyword(keyword)
-		}
-		return root_keywords[keyword]
+	ToscaSyntax(String root) {
+		this.root = root
+		root_entry = new ToscaKeyword(root)
 	}
-
-	ValidationResult check(String keyword, Map model) {
-		if (root_keywords[keyword] == null) {
-			return ValidationResult.failure("unknown keyword '$keyword' at root level")
-		}
-		def kw = root_keywords[keyword]
+	
+	ValidationResult check(model) {
 		def vr = new ValidationResult()
-		kw.check(model, vr)
+		root_entry.check(model, vr)
 		return vr
 	}
 }
