@@ -1,6 +1,6 @@
 package builder
 
-import java.util.Map
+import com.esotericsoftware.yamlbeans.YamlReader
 
 /**
  * Helper class to build tosca service templates as maps
@@ -41,6 +41,64 @@ class ToscaBuilder {
 			template_author: 'OASIS TOSCA TC',			
 			template_version: '1.0'
 		]
+	}
+	
+	static Map simple_dsl_definitions() {
+		def text = '''\
+dsl_definitions:
+  my_compute_node_props: &my_compute_node_props
+    disk_size: 10 GB
+    num_cpus: 1
+    mem_size: 2 GB
+topology_template:
+  node_templates:
+    my_server:
+      type: Compute
+      capabilities:
+        host:
+          properties: *my_compute_node_props
+    my_database:
+      type: Compute
+      capabilities:
+        host:
+          properties: *my_compute_node_props
+'''
+		def model = new YamlReader(text).read()
+		return simple_service_template() + model
+	}
+	
+	static Map simple_repositories() {
+		def text = '''\
+repositories:
+  my_code_repo:
+    description: "My project's code repository in GitHub"
+    url: "https://github.com/my-project/"
+'''
+		def model = new YamlReader(text).read()
+		return simple_service_template() + model
+	}
+
+	static Map simple_imports() { // multi-line grammar
+		def text = '''\
+imports: 
+  - file: <file_URI>
+    repository: <repository_name>
+    namespace_uri: <definition_namespace_uri>
+    namespace_prefix: <definition_namespace_prefix>
+'''
+		def model = new YamlReader(text).read()
+		return simple_service_template() + model
+	}
+
+	static Map simple_imports2() { // single-line grammar
+		def text = '''\
+imports: 
+  - fichier1.yaml
+  - fichier2.yaml
+  - fichier3.yaml
+'''
+		def model = new YamlReader(text).read()
+		return simple_service_template() + model
 	}
 
 	static Map host(int num_cpus, String disk_size, String mem_size) {
