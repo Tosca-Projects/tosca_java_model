@@ -66,12 +66,12 @@ class ToscaKeyword {
 		return children[child]
 	}
 
-	ToscaKeyword is_mandatory() {
+	ToscaKeyword mandatory() {
 		this.is_mandatory = true
 		return this
 	}
 
-	ToscaKeyword is_a(String type) {
+	ToscaKeyword a(String type) {
 		if (!(type in VALID_TYPES)) {
 			throw new Exception("'$type' is not a valid type: '$VALID_TYPES'")
 		}
@@ -104,6 +104,13 @@ class ToscaKeyword {
 					child = children['*']
 				}
 				child.check(v, vr)
+			}
+			children.each { k,v ->
+				if (v.is_mandatory) {
+					if (model[k] == null) {
+						vr.fail("missing mandatory child '$k' for node '$keyword'")
+					}
+				}
 			}
 			return
 		}
