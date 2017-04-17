@@ -5,8 +5,9 @@ class ToscaValidator {
 	static Map<String,Closure> rules = [
 		
 		// Root level
-		'':{ Map model ->
+		'':{ model ->
 			def result = new ValidationResult()
+			checkIsMap(model, "root level", result)
 			def valid_keywords = [
 				'tosca_definitions_version',
 				'metadata',
@@ -28,30 +29,36 @@ class ToscaValidator {
 				'topology_template'
 				]
 			checkKeys(model, valid_keywords, result)
-			checkPresent(model, 'tosca_definitions_version', result)
-			checkString(model, 'tosca_definitions_version', result)
-			checkMap(model, 'metadata', result)
-			checkString(model, 'template_name', result)
-			checkString(model, 'template_version', result)
-			checkString(model, 'template_author', result)
-			checkString(model, 'description', result)
+			checkIsPresent(model, 'tosca_definitions_version', result)
+			checkIsString(model, 'tosca_definitions_version', result)
+			checkIsMap(model, 'metadata', result)
+			checkIsString(model, 'template_name', result)
+			checkIsString(model, 'template_version', result)
+			checkIsString(model, 'template_author', result)
+			checkIsString(model, 'description', result)
 			checkList(model, 'imports', result)
-			checkMap(model, 'dsl_definitions', result)
-			checkMap(model, 'repositories', result)
-			checkMap(model, 'artifact_types', result)
-			checkMap(model, 'data_types', result)
-			checkMap(model, 'capability_types', result)
-			checkMap(model, 'interface_types', result)
-			checkMap(model, 'relationship_types', result)
-			checkMap(model, 'node_types', result)
-			checkMap(model, 'group_types', result)
-			checkMap(model, 'policy_types', result)
-			checkMap(model, 'topology_template', result)
+			checkIsMap(model, 'dsl_definitions', result)
+			checkIsMap(model, 'repositories', result)
+			checkIsMap(model, 'artifact_types', result)
+			checkIsMap(model, 'data_types', result)
+			checkIsMap(model, 'capability_types', result)
+			checkIsMap(model, 'interface_types', result)
+			checkIsMap(model, 'relationship_types', result)
+			checkIsMap(model, 'node_types', result)
+			checkIsMap(model, 'group_types', result)
+			checkIsMap(model, 'policy_types', result)
+			checkIsMap(model, 'topology_template', result)
 			return result
+		},
+	
+		'metadata': { model ->
+			def result = new ValidationResult()
+			checkList(model, "metadata", result)
+			
 		}
 	]
 	
-	static ValidationResult validate(Map model, String node_name = '') {
+	static ValidationResult validate(model, String node_name = '') {
 		return rules[node_name].call(model)
 	}
 	
@@ -63,19 +70,19 @@ class ToscaValidator {
 		}
 	}
 	
-	static checkPresent(Map model, String k, ValidationResult vr) {
+	static checkIsPresent(Map model, String k, ValidationResult vr) {
 		if (!model[k]) {
 			vr.fail("keyword '$k' should be present")
 		}
 	}
 
-	static checkString(Map model, String k, ValidationResult vr) {
+	static checkIsString(Map model, String k, ValidationResult vr) {
 		if (model[k] && !(model[k] instanceof String)) {
 			vr.fail("'$k' should be a string")
 		}
 	}
 
-	static checkMap(Map model, String k, ValidationResult vr) {
+	static checkIsMap(Map model, String k, ValidationResult vr) {
 		if (model[k] && !(model[k] instanceof Map)) {
 			vr.fail("'$k' should be a map")
 		}
@@ -89,14 +96,3 @@ class ToscaValidator {
 
 }
 
-class ValidationResult {
-	
-	boolean OK = true
-	List<String> messages = [] 
-	
-	void fail(String msg) {
-		OK = false
-		messages << msg
-	}
-	
-}

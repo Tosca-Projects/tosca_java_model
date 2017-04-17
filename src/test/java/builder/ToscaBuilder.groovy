@@ -21,6 +21,12 @@ class ToscaBuilder {
 			  ]
 		]
 	}
+	
+	static Map wrong_service_template() {
+		def model = simple_service_template()
+		model["wrong_keyword"] = "should fail"
+		return model
+	}
 
 	static Map simple_service_template2() { // autre syntaxe
 		return [
