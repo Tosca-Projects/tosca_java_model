@@ -46,7 +46,7 @@ class TestToscaBuilder {
 	
 	@Test
 	public void testTopologyTemplateWithInputs() {
-		def model = ToscaBuilder.topology_template_with_inputs()
+		def model = ToscaBuilder.simple_inputs()
 		def src = new Yaml().dump(model)
 		assert ToscaParser.validate_tosca_yaml(src)
 		assert ToscaParser.validate_service_template(model)

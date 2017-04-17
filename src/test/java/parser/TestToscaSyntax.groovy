@@ -12,60 +12,74 @@ class TestToscaSyntax {
 	public void test() {
 		def s = new ToscaSyntax("service_template")
 		s.root_entry.a("map").with {
-			entry("tosca_definitions_version").mandatory()
-			entry("metadata").a("map").with {
-				entry "template_name"
-				entry "template_version"
-				entry "template_author"
+			string_entry("tosca_definitions_version").mandatory()
+			map_entry("metadata").with {
+				string_entry "template_name"
+				string_entry "template_version"
+				string_entry "template_author"
 			}
-			entry "template_name"
-			entry "template_version"
-			entry "template_author"
-			entry "description"
-			entry("dsl_definitions").a("map").with { 
+			string_entry "template_name"
+			string_entry "template_version"
+			string_entry "template_author"
+			string_entry "description"
+			map_entry("dsl_definitions").with { 
 				any_entry().with {
 					any_entry()
 				}
 			}
-			entry("repositories").a("map").with {
+			map_entry("repositories").with {
 				any_entry().with {
-					entry "description"
-					entry "url"
-					entry("credential").a("map").with {
-						entry "protocol"
-						entry("token_type").mandatory()
-						entry("token").mandatory()
-						entry("keys").a("map")
-						entry "user"
+					string_entry("description")
+					string_entry("url")
+					map_entry("credential").with {
+						string_entry("protocol")
+						string_entry("token_type").mandatory()
+						string_entry("token").mandatory()
+						map_entry("keys")
+						string_entry("user")
 					}
 				}
 			}
-			entry("imports").a("list").with {
-				any_entry().a("map").with {
-					entry("file").mandatory()
-					entry "repository"
-					entry "namespace_uri"
-					entry "namespace_prefix"
+			list_entry("imports").with {
+				any_map_entry().with {
+					string_entry("file").mandatory()
+					string_entry("repository")
+					string_entry("namespace_uri")
+					string_entry("namespace_prefix")
 					or_a("string")
 				}
 			}
-			entry("topology_template").a("map").with {
-				entry "description"
-				entry("node_templates").a("map").with {
-					any_entry().a("map").with {
-						entry("type").mandatory()
-						entry "description"
-						entry("metadata").a("map").with {
-							entry "template_name"
-							entry "template_version"
-							entry "template_author"
+			map_entry("topology_template").with {
+				string_entry "description"
+				map_entry("inputs").with {  
+					any_map_entry().with {
+						string_entry "type"
+						string_entry "description"
+						boolean_entry "required"
+						entry "default"
+						string_entry "status"
+						list_entry("constraints").with {  
+							// TODO	
 						}
-						entry("directives").a("list")
-						entry("properties").a("map")
-						entry("capabilities").a("map").with {  
-							any_entry().a("map").with {
-								entry("properties").a("map").with { any_entry() }
-								entry("attributes").a("map").with { any_entry() }
+					}
+				}
+				map_entry("node_templates").with {
+					any_map_entry().with {
+						string_entry("type").mandatory()
+						string_entry "description"
+						map_entry("metadata").with {
+							string_entry "template_name"
+							string_entry "template_version"
+							string_entry "template_author"
+						}
+						list_entry "directives"
+						map_entry "properties".with { 
+							// TODO
+						}
+						map_entry("capabilities").with {  
+							any_map_entry().with {
+								map_entry("properties").with { any_entry() }
+								map_entry("attributes").with { any_entry() }
 							}
 						}
 					}
@@ -81,5 +95,6 @@ class TestToscaSyntax {
 		assert s.check(ToscaBuilder.simple_repositories()).OK
 		assert s.check(ToscaBuilder.simple_imports()).OK
 		assert s.check(ToscaBuilder.simple_imports2()).OK
+		assert s.check(ToscaBuilder.simple_inputs()).OK
 	}
 }

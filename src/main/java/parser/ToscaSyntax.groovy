@@ -50,7 +50,7 @@ class ToscaKeyword {
 	String keyword
 	Map<String,ToscaKeyword> children = [:]
 	boolean is_mandatory = false
-	static final VALID_TYPES = ['string', 'map', 'list']
+	static final VALID_TYPES = ['string', 'map', 'list', 'boolean']
 	Set<String> valid_types = VALID_TYPES // by default all types
 	
 	ToscaKeyword(String keyword, ToscaKeyword parent = null) {
@@ -63,6 +63,22 @@ class ToscaKeyword {
 		}
 		children[child] = new ToscaKeyword(child, this)
 		return children[child]
+	}
+	
+	ToscaKeyword string_entry(String child) {
+		return entry(child).a("string")
+	}
+
+	ToscaKeyword map_entry(String child) {
+		return entry(child).a("map")
+	}
+
+	ToscaKeyword list_entry(String child) {
+		return entry(child).a("list")
+	}
+
+	ToscaKeyword boolean_entry(String child) {
+		return entry(child).a("boolean")
 	}
 
 	ToscaKeyword mandatory() {
@@ -89,6 +105,11 @@ class ToscaKeyword {
 	ToscaKeyword any_entry() {
 		children['*'] = new ToscaKeyword('*', this)
 		return children['*']
+	}
+	
+	ToscaKeyword any_map_entry() {
+		children['*'] = new ToscaKeyword('*', this)
+		return children['*'].a("map")
 	}
 	
 	boolean check_type(model, Set valid_types, ValidationResult vr, stack = '') {

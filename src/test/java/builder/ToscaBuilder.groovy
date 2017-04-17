@@ -158,7 +158,7 @@ imports:
 		]
 	}
 
-	static Map topology_template_with_inputs() {
+	static Map simple_inputs() {
 		def t = simple_topology_template()
 		t."topology_template"."inputs" = cpus_inputs()
 		return t
