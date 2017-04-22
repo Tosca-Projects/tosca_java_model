@@ -10,8 +10,8 @@ class TestToscaSyntax extends GroovyTestCase {
 
 	@Test
 	public void test_version_1_1() {
-		assert shouldFail { ToscaSyntax.ServiceTemplateSyntax("1.0") } == "only version 1.1 is supported at this time"
-		def s = ToscaSyntax.ServiceTemplateSyntax("1.1")
+		assert shouldFail { ToscaSyntax.getServiceTemplateSyntax("1.0") } == "only version 1.1 is supported at this time"
+		def s = ToscaSyntax.getServiceTemplateSyntax("1.1")
 		assert s.check(ToscaBuilder.simple_service_template()).OK
 		assert s.check(ToscaBuilder.simple_service_template2()).OK
 		assert s.check(ToscaBuilder.wrong_service_template()).OK == false

@@ -16,7 +16,7 @@ class ToscaSyntax {
 		return vr
 	}
 	
-	ToscaSyntax getServiceTemplateSyntax(String version) {
+	static ToscaSyntax getServiceTemplateSyntax(String version) {
 		if (version != "1.1") {
 			throw new Exception("only version 1.1 is supported at this time")
 		}
