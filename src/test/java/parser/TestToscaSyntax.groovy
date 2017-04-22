@@ -49,6 +49,21 @@ class TestToscaSyntax {
 					or_a("string")
 				}
 			}
+			map_entry("artifact_types").with {
+				any_map_entry().with {
+					string_entry "derived_from"
+					string_entry "version"
+					map_entry("metadata").with {
+						string_entry "template_name"
+						string_entry "template_version"
+						string_entry "template_author"
+					}
+					string_entry "description"
+					string_entry "mime_type"
+					list_entry("file_ext")
+					properties_entry()
+				}
+			}
 			map_entry("topology_template").with {
 				string_entry "description"
 				map_entry("inputs").with {  
@@ -73,9 +88,7 @@ class TestToscaSyntax {
 							string_entry "template_author"
 						}
 						list_entry "directives"
-						map_entry "properties".with { 
-							// TODO
-						}
+						properties_entry()
 						map_entry("capabilities").with {  
 							any_map_entry().with {
 								map_entry("properties").with { any_entry() }

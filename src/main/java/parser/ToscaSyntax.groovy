@@ -11,7 +11,7 @@ class ToscaSyntax {
 		this.root = root
 		root_entry = new ToscaKeyword(root)
 	}
-	
+
 	ValidationResult check(model) {
 		def vr = new ValidationResult()
 		root_entry.check(model, vr)
@@ -30,11 +30,20 @@ class ValidationResult {
 		return vr
 	}
 
+	void fail(String msg, Stack stack) {
+		if (stack && stack.size() > 0) {
+			fail "$msg ($stack)"
+		}
+		else {
+			fail "msg"
+		}
+	}
+
 	void fail(String msg) {
 		OK = false
 		messages << msg
 	}
-	
+
 	String toString() {
 		if (OK) {
 			return "OK"
@@ -52,9 +61,15 @@ class ToscaKeyword {
 	boolean is_mandatory = false
 	static final VALID_TYPES = ['string', 'map', 'list', 'boolean']
 	Set<String> valid_types = VALID_TYPES // by default all types
-	
+	List<String> valid_values
+
 	ToscaKeyword(String keyword, ToscaKeyword parent = null) {
 		this.keyword = keyword
+	}
+
+	ToscaKeyword values(List<String> values) {
+		this.valid_values = values
+		return this
 	}
 
 	ToscaKeyword entry(String child) {
@@ -64,7 +79,7 @@ class ToscaKeyword {
 		children[child] = new ToscaKeyword(child, this)
 		return children[child]
 	}
-	
+
 	ToscaKeyword string_entry(String child) {
 		return entry(child).a("string")
 	}
@@ -81,6 +96,30 @@ class ToscaKeyword {
 		return entry(child).a("boolean")
 	}
 
+	ToscaKeyword properties_entry() {
+		this.map_entry("properties").with {
+			any_map_entry().with {
+				string_entry("type").mandatory()
+				string_entry "description"
+				boolean_entry "required"
+				entry "default"
+				string_entry("status").values(
+					[   "supported", 
+						"unsupported", 
+						"experimental", 
+						"deprecated"])
+				constraints_entry()
+				string_entry "entry_schema"
+			}
+		}
+		return this
+	}
+
+	ToscaKeyword constraints_entry() {
+		// TODO
+		return this
+	}
+
 	ToscaKeyword mandatory() {
 		this.is_mandatory = true
 		return this
@@ -90,7 +129,7 @@ class ToscaKeyword {
 		if (!(type in VALID_TYPES)) {
 			throw new Exception("'$type' is not a valid type: '$VALID_TYPES'")
 		}
-		this.valid_types = [ type ]
+		this.valid_types = [type]
 		return this
 	}
 
@@ -106,12 +145,12 @@ class ToscaKeyword {
 		children['*'] = new ToscaKeyword('*', this)
 		return children['*']
 	}
-	
+
 	ToscaKeyword any_map_entry() {
 		children['*'] = new ToscaKeyword('*', this)
 		return children['*'].a("map")
 	}
-	
+
 	boolean check_type(model, Set valid_types, ValidationResult vr, stack = '') {
 		def model_type = "string" // default
 		if (model instanceof Map) {
@@ -121,13 +160,13 @@ class ToscaKeyword {
 			model_type = "list"
 		}
 		if (!(model_type in valid_types)) {
-			vr.fail("$keyword type should be one of the following: $valid_types $stack")
+			vr.fail("$keyword type should be one of the following: $valid_types", stack)
 			return false
 		}
 		return true
-	} 
+	}
 
-	void check(model, ValidationResult vr, stack = []) {
+	void check(model, ValidationResult vr, Stack stack = []) {
 		if (!check_type(model, this.valid_types, vr, stack)) {
 			return // no need to check further
 		}
@@ -136,17 +175,17 @@ class ToscaKeyword {
 				def child = children[k]
 				if (child == null) {
 					if (children['*'] == null) {
-						vr.fail("child '$k' is not valid for node '$keyword' (stack: $stack)")
+						vr.fail("child '$k' is not valid for node '$keyword'", stack)
 						return
 					}
 					child = children['*']
 				}
 				child.check(v, vr, stack+keyword)
 			}
-			children.each { k,v ->
+			children.each { String k, ToscaKeyword v ->
 				if (v.is_mandatory) {
 					if (model[k] == null) {
-						vr.fail("missing mandatory child '$k' for node '$keyword'")
+						vr.fail("missing mandatory child '$k' for node '$keyword'", stack)
 					}
 				}
 			}
@@ -156,10 +195,15 @@ class ToscaKeyword {
 			def valid_types = children['*'].valid_types
 			model.each { item ->
 				check_type(item, valid_types, vr)
+				if (item instanceof String && this.valid_values) {
+					if (!(valid_values.contains(item))) {
+						vr.fail("value '$item' in not a valid value for node '$keyword'", stack)
+					}
+				}
 			}
 		}
 	}
-	
+
 	String toString() {
 		return this.keyword
 	}
