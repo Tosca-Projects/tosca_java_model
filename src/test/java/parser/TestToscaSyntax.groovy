@@ -22,5 +22,9 @@ class TestToscaSyntax extends GroovyTestCase {
 		assert s.check(ToscaBuilder.simple_imports()).OK
 		assert s.check(ToscaBuilder.simple_imports2()).OK
 		assert s.check(ToscaBuilder.simple_inputs()).OK
+		def result = s.check(ToscaBuilder.complex_service_template())
+		if (!result.OK) {
+			println result
+		}
 	}
 }

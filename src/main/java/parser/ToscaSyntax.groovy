@@ -22,87 +22,77 @@ class ToscaSyntax {
 		}
 		def s = new ToscaSyntax("service_template")
 		s.root_entry.a("map").with {
-			a_string("tosca_definitions_version").mandatory()
-			a_map("metadata").with {
-				a_string "template_name"
-				a_string "template_version"
-				a_string "template_author"
-			}
-			a_string "template_name"
-			a_string "template_version"
-			a_string "template_author"
-			a_string "description"
-			a_map("dsl_definitions").with {
-				any_entry().with {
+			string_entry("tosca_definitions_version").mandatory()
+			metadata_entry()
+			string_entry "template_name"
+			string_entry "template_version"
+			string_entry "template_author"
+			string_entry "description"
+			map_entry("dsl_definitions").with {
+				any_map_entry().with {
 					any_entry()
 				}
 			}
-			a_map("repositories").with {
-				any_entry().with {
-					a_string("description")
-					a_string("url")
-					a_map("credential").with {
-						a_string("protocol")
-						a_string("token_type").mandatory()
-						a_string("token").mandatory()
-						a_map("keys")
-						a_string("user")
+			map_entry("repositories").with {
+				any_map_entry().with {
+					string_entry("description")
+					string_entry("url")
+					map_entry("credential").with {
+						string_entry("protocol")
+						string_entry("token_type").mandatory()
+						string_entry("token").mandatory()
+						map_entry("keys")
+						string_entry("user")
 					}
 				}
 			}
-			a_list("imports").with {
-				any_map().with {
-					a_string("file").mandatory()
-					a_string("repository")
-					a_string("namespace_uri")
-					a_string("namespace_prefix")
+			list_entry("imports").with {
+				any_map_entry().with {
+					string_entry("file").mandatory()
+					string_entry("repository")
+					string_entry("namespace_uri")
+					string_entry("namespace_prefix")
 					or_a("string")
 				}
 			}
-			a_map("artifact_types").with {
-				any_map().with {
-					a_string "derived_from"
-					a_string "version"
-					a_map("metadata").with {
-						a_string "template_name"
-						a_string "template_version"
-						a_string "template_author"
-					}
-					a_string "description"
-					a_string "mime_type"
-					a_list("file_ext")
-					a_properties_entry()
+			map_entry("artifact_types").with {
+				any_map_entry().with {
+					string_entry "derived_from"
+					string_entry "version"
+					metadata_entry()
+					string_entry "description"
+					string_entry "mime_type"
+					list_entry("file_ext")
+					property_definitions_entry()
 				}
 			}
-			a_map("topology_template").with {
-				a_string "description"
-				a_map("inputs").with {
-					any_map().with {
-						a_string "type"
-						a_string "description"
-						a_boolean "required"
+			map_entry("topology_template").with {
+				string_entry "description"
+				map_entry("inputs").with {
+					any_map_entry().with {
+						string_entry "type"
+						string_entry "description"
+						boolean_entry "required"
 						entry "default"
-						a_string "status"
-						a_constraints_entry()
+						string_entry "status"
+						constraints_entry()
 					}
 				}
-				a_map("node_templates").with {
-					any_map().with {
-						a_string("type").mandatory()
-						a_string "description"
-						a_map("metadata").with {
-							a_string "template_name"
-							a_string "template_version"
-							a_string "template_author"
-						}
-						a_list "directives"
-						a_properties_entry()
-						a_map("capabilities").with {
-							any_map().with {
-								a_map("properties").with { any_entry() }
-								a_map("attributes").with { any_entry() }
-							}
-						}
+				map_entry("node_templates").with {
+					any_map_entry().with {
+						string_entry("type").mandatory()
+						string_entry "description"
+						metadata_entry()
+						list_entry("directives").with { any_string_entry() }
+						property_assignments_entry()
+						capabilities_entry()
+						requirements_entry()					
+					}
+				}
+				map_entry("outputs").with {
+					any_map_entry().with {
+						string_entry "description"
+						entry "value"
 					}
 				}
 			}

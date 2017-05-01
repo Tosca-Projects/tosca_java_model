@@ -10,7 +10,7 @@ class ToscaKeyword {
 	String keyword
 	Map<String,ToscaKeyword> children = [:]
 	boolean is_mandatory = false
-	static final VALID_TYPES = ['string', 'map', 'list', 'boolean', 'scalar']
+	static final VALID_TYPES = ['string', 'map', 'list', 'boolean', 'scalar', 'range']
 	Set<String> valid_types = VALID_TYPES // by default all types
 	List<String> valid_values
 
@@ -31,55 +31,124 @@ class ToscaKeyword {
 		return children[child]
 	}
 
-	ToscaKeyword a_string(String child) {
+	ToscaKeyword string_entry(String child) {
 		return entry(child).a("string")
 	}
 
-	ToscaKeyword a_map(String child) {
+	ToscaKeyword map_entry(String child) {
 		return entry(child).a("map")
 	}
 
-	ToscaKeyword a_list(String child) {
+	ToscaKeyword list_entry(String child) {
 		return entry(child).a("list")
 	}
 
-	ToscaKeyword a_boolean(String child) {
+	ToscaKeyword range_entry(String child) {
+		return entry(child).a("range")
+	}
+
+	ToscaKeyword boolean_entry(String child) {
 		return entry(child).a("boolean")
 	}
 
-	ToscaKeyword a_scalar(String child) {
+	ToscaKeyword scalar_entry(String child) {
 		return entry(child).a("scalar")
 	}
-
-	ToscaKeyword a_properties_entry() {
-		this.a_map("properties").with {
-			any_map().with {
-				a_string("type").mandatory()
-				a_string "description"
-				a_boolean "required"
-				a_scalar "default"
-				a_string("status").valid_values(
+	
+	ToscaKeyword property_definitions_entry() {
+		this.map_entry("properties").with {
+			any_map_entry().with {
+				string_entry("type").mandatory()
+				string_entry "description"
+				boolean_entry "required"
+				scalar_entry "default"
+				string_entry("status").valid_values(
 						["supported", "unsupported", "experimental", "deprecated"])
-				a_constraints_entry()
-				a_string "entry_schema"
+				constraints_entry()
+				string_entry "entry_schema"
+			}
+		}
+		return this
+	}
+	
+	ToscaKeyword property_assignments_entry() {
+		this.map_entry("properties")
+		return this
+	}
+	
+	ToscaKeyword attributes_entry() {
+		this.map_entry("attributes").with {
+			any_map_entry().with {
+				string_entry("type").mandatory()
+				string_entry "description"
+				scalar_entry "default"
+				string_entry("status").valid_values(
+						["supported", "unsupported", "experimental", "deprecated"])
+				string_entry "entry_schema"
 			}
 		}
 		return this
 	}
 
-	ToscaKeyword a_constraints_entry() {
-		this.a_list("constraints").with {
-			a_map("equal").with { a_scalar() }
-			a_map("greater_than").with { a_scalar() }
-			a_map("greater_or_equal").with { a_scalar() }
-			a_map("less_than").with { a_scalar() }
-			a_map("less_or_equal").with { a_scalar() }
-			a_map("in_range").with { any_list() }
-			a_map("valid_values").with { any_list() }
-			a_map("length").with { a_scalar() }
-			a_map("min_length").with { a_scalar() }
-			a_map("max_length").with { a_scalar() }
-			a_map("pattern").with { a_string() }
+	ToscaKeyword metadata_entry() {
+		map_entry("metadata").with {
+			string_entry "template_name"
+			string_entry "template_version"
+			string_entry "template_author"
+		}
+		return this
+	}
+
+	ToscaKeyword entity_entry() {
+		string_entry("derived_from")
+		string_entry "version"
+		metadata_entry
+		string_entry "description"
+		return this
+	}
+
+	ToscaKeyword capabilities_entry() {
+		this.map_entry("capabilities").with {
+			any_map_entry().with {
+				string_entry("type").mandatory()
+				string_entry "description"
+				property_definitions_entry()
+				attributes_entry()
+				list_entry("valid_source_types").with { any_string_entry() }
+				range_entry("occurrences")
+			}
+		}
+		return this
+	}
+	
+	ToscaKeyword requirements_entry() {
+		list_entry("requirements").with {
+			any_map_entry().with {
+				string_entry "capability"
+				string_entry "node"
+				string_entry "relationship"
+				map_entry("node_filter").with {
+					property_definitions_entry()
+					capabilities_entry()
+				}
+			}
+		}
+		return this
+	}
+
+	ToscaKeyword constraints_entry() {
+		this.list_entry("constraints").with {
+			map_entry("equal").with { any_scalar_entry() }
+			map_entry("greater_than").with { any_scalar_entry() }
+			map_entry("greater_or_equal").with { any_scalar_entry() }
+			map_entry("less_than").with { any_scalar_entry() }
+			map_entry("less_or_equal").with { any_scalar_entry() }
+			map_entry("in_range").with { any_list_entry() }
+			map_entry("valid_values").with { any_list_entry() }
+			map_entry("length").with { any_scalar_entry() }
+			map_entry("min_length").with { any_scalar_entry() }
+			map_entry("max_length").with { any_scalar_entry() }
+			map_entry("pattern").with { any_string_entry() }
 		}
 		return this
 	}
@@ -114,22 +183,22 @@ class ToscaKeyword {
 		return children['*']
 	}
 
-	ToscaKeyword any_map() {
+	ToscaKeyword any_map_entry() {
 		children['*'] = new ToscaKeyword('*', this)
 		return children['*'].a("map")
 	}
 
-	ToscaKeyword any_list() {
+	ToscaKeyword any_list_entry() {
 		children['*'] = new ToscaKeyword('*', this)
 		return children['*'].a("list")
 	}
 
-	ToscaKeyword a_scalar() {
+	ToscaKeyword any_scalar_entry() {
 		children['*'] = new ToscaKeyword('*', this)
 		return children['*'].a("scalar")
 	}
 
-	ToscaKeyword a_string() {
+	ToscaKeyword any_string_entry() {
 		children['*'] = new ToscaKeyword('*', this)
 		return children['*'].a("string")
 	}
@@ -153,7 +222,7 @@ class ToscaKeyword {
 		if (!check_type(model, this.valid_types, vr, stack)) {
 			return // no need to check further
 		}
-		if (model instanceof Map) {
+		if (model instanceof Map && children.size() > 0) {
 			model.each { k,v ->
 				def child = children[k]
 				if (child == null) {

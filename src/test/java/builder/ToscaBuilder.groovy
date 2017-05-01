@@ -262,4 +262,9 @@ imports:
 			]
 		]
 	}
+	
+	static Map complex_service_template() {
+		def text = new File('src/test/resources/junit/valid_level0_keywords.yml').text
+		return new YamlReader(text).read()
+	}
 }
