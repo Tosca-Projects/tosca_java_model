@@ -1,9 +1,6 @@
 package parser
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import utils.Logger
 
 class ToscaKeyword {
 
@@ -54,7 +51,7 @@ class ToscaKeyword {
 	ToscaKeyword scalar_entry(String child) {
 		return entry(child).a("scalar")
 	}
-	
+
 	ToscaKeyword property_definitions_entry() {
 		this.map_entry("properties").with {
 			any_map_entry().with {
@@ -70,12 +67,12 @@ class ToscaKeyword {
 		}
 		return this
 	}
-	
+
 	ToscaKeyword property_assignments_entry() {
 		this.map_entry("properties")
 		return this
 	}
-	
+
 	ToscaKeyword attributes_entry() {
 		this.map_entry("attributes").with {
 			any_map_entry().with {
@@ -107,20 +104,48 @@ class ToscaKeyword {
 		return this
 	}
 
-	ToscaKeyword capabilities_entry() {
+	ToscaKeyword capability_assignments_entry() {
 		this.map_entry("capabilities").with {
 			any_map_entry().with {
-				string_entry("type").mandatory()
-				string_entry "description"
-				property_definitions_entry()
+				map_entry("properties")
 				attributes_entry()
-				list_entry("valid_source_types").with { any_string_entry() }
-				range_entry("occurrences")
 			}
 		}
 		return this
 	}
-	
+
+	ToscaKeyword operation_definitions_entry(boolean used_in_type_definition) {
+		any_map_entry().with {
+			// ex: "Standard"
+			any_map_entry().with {
+				// ex: "configure"
+				string_entry("description")
+				string_entry("implementation")
+				map_entry("inputs")
+				or_a("string") // syntaxe compacte <verbe>: <implémentation>
+			}
+		}
+		return this
+	}
+
+	ToscaKeyword interface_definitions_entry(boolean used_in_type_definition=false) {
+		this.map_entry("interfaces").with {
+			if (used_in_type_definition) {
+				string_entry("type").mandatory()
+				map_entry("inputs").with {
+					any_map_entry()
+				}
+			}
+			else {
+				map_entry("inputs").with {
+					any_map_entry()
+				}
+			}
+			operation_definitions_entry(used_in_type_definition)
+		}
+		return this
+	}
+
 	ToscaKeyword requirements_entry() {
 		list_entry("requirements").with {
 			any_map_entry().with {
@@ -129,7 +154,7 @@ class ToscaKeyword {
 				string_entry "relationship"
 				map_entry("node_filter").with {
 					property_definitions_entry()
-					capabilities_entry()
+					capability_assignments_entry()
 				}
 			}
 		}
@@ -223,6 +248,7 @@ class ToscaKeyword {
 			return // no need to check further
 		}
 		if (model instanceof Map && children.size() > 0) {
+			Logger.debug "model=$model stack=$stack"
 			model.each { k,v ->
 				def child = children[k]
 				if (child == null) {

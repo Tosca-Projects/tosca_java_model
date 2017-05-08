@@ -84,9 +84,11 @@ class ToscaSyntax {
 						string_entry "description"
 						metadata_entry()
 						list_entry("directives").with { any_string_entry() }
-						property_assignments_entry()
-						capabilities_entry()
-						requirements_entry()					
+						map_entry("properties")
+						attributes_entry()
+						requirements_entry()
+						capability_assignments_entry()
+						interface_definitions_entry()
 					}
 				}
 				map_entry("outputs").with {

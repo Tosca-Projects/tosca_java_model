@@ -69,7 +69,7 @@ topology_template:
         - host: mongo_dbms
       interfaces:
         Standard:
-         create: create_database.sh
+          create: create_database.sh
  
     mongo_dbms:
       type: tosca.nodes.DBMS
@@ -101,7 +101,7 @@ topology_template:
             tosca.interfaces.relationship.Configure:
               pre_configure_source:
                 implementation: python/logstash/configure_elasticsearch.py
-                input:
+                inputs:
                   elasticsearch_ip: { get_attribute: [elasticsearch_server, ip_address] }
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
@@ -119,7 +119,7 @@ topology_template:
           create: scripts/kibana/create.sh
           configure:
             implementation: scripts/kibana/config.sh
-            input:
+            inputs:
               elasticsearch_ip: { get_attribute: [elasticsearch_server, ip_address] }
               kibana_ip: { get_attribute: [kibana_server, ip_address] }
           start: scripts/kibana/start.sh
@@ -138,7 +138,7 @@ topology_template:
           create: scripts/collectd/create.sh
           configure:
             implementation: python/collectd/config.py
-            input:
+            inputs:
               logstash_ip: { get_attribute: [logstash_server, ip_address] }
           start: scripts/collectd/start.sh
  
@@ -156,7 +156,7 @@ topology_template:
           create: scripts/rsyslog/create.sh
           configure:
             implementation: scripts/rsyslog/config.sh
-            input:
+            inputs:
               logstash_ip: { get_attribute: [logstash_server, ip_address] }
           start: scripts/rsyslog/start.sh
  

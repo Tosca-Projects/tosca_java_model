@@ -36,4 +36,15 @@ class ValidationResult {
 			return "KO: $messages"
 		}
 	}
+	
+	void print() {
+		if (OK) {
+			println "OK"
+		}
+		else {
+			messages.each {
+				println it
+			}
+		}
+	}
 }
