@@ -127,7 +127,7 @@ class ToscaKeyword {
 		}
 		return this
 	}
-
+	
 	ToscaKeyword interface_definitions_entry(boolean used_in_type_definition=false) {
 		this.map_entry("interfaces").with {
 			if (used_in_type_definition) {
@@ -142,6 +142,27 @@ class ToscaKeyword {
 				}
 			}
 			operation_definitions_entry(used_in_type_definition)
+		}
+		return this
+	}
+	
+	ToscaKeyword imperative_workflows_entry() {
+		this.map_entry("workflows").with {
+			any_map_entry().with {
+				string_entry("description")
+				map_entry("steps").with {
+					any_map_entry().with {
+						string_entry("target")
+						list_entry("activities").with {  
+							string_entry("delegate")
+							string_entry("set_state")
+							string_entry("call_operation")
+							string_entry("inline")
+						}
+						list_entry("on_success").or_a("string")
+					}
+				}
+			}
 		}
 		return this
 	}

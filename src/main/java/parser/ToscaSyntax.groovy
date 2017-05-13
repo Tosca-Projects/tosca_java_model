@@ -97,6 +97,7 @@ class ToscaSyntax {
 						entry "value"
 					}
 				}
+				imperative_workflows_entry()
 			}
 		}
 		return s

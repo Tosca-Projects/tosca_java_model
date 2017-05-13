@@ -1,0 +1,49 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+ 
+topology_template:
+  node_templates:
+    my_server:
+      type: tosca.nodes.Compute
+    mysql:
+      type: tosca.nodes.DBMS.MySQL
+      requirements:
+        - host: my_server
+    tomcat:
+      type: tosca.nodes.WebServer.Tomcat
+      requirements:
+        - host: my_server
+  workflows:
+    deploy:
+      description: Override the TOSCA declarative workflow with the following.
+      steps:
+        compute_install:
+          target: my_server
+          activities:
+            - delegate: deploy
+          on_success:
+            - mysql_install
+            - tomcat_install
+        tomcat_install:
+          target: tomcat
+          activities:
+            - set_state: creating
+            - call_operation: tosca.interfaces.node.lifecycle.Standard.create
+            - set_state: created
+          on_success: tomcat_starting
+        mysql_install:
+          target: mysql
+          activities:
+            - set_state: creating
+            - call_operation: tosca.interfaces.node.lifecycle.Standard.create
+            - set_state: created
+            - set_state: starting
+            - call_operation: tosca.interfaces.node.lifecycle.Standard.start
+            - set_state: started
+          on_success:
+            - tomcat_starting
+        tomcat_starting:
+          target: tomcat
+          activities:
+            - set_state: starting
+            - call_operation: tosca.interfaces.node.lifecycle.Standard.start
+            - set_state: started

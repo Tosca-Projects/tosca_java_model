@@ -267,4 +267,9 @@ imports:
 		def text = new File('src/test/resources/junit/valid_level0_keywords.yml').text
 		return new YamlReader(text).read()
 	}
+	
+	static Map simple_imperative_workflow() {
+		def text = new File('src/test/resources/junit/sample_workflow_template.yml').text
+		return new YamlReader(text).read()
+	}
 }
